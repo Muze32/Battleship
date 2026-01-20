@@ -5,7 +5,7 @@ class Ship {
     }
 
     hit() {
-        if(this.isSunk()) {
+        if (this.isSunk()) {
             throw new Error('Cant hit a sunken ship');
         }
 
@@ -21,6 +21,72 @@ class Ship {
     }
 };
 
+class Gameboard {
+    constructor(size = 10, ships = 5) {
+        this.board = [];
+        this.ships = ships;
+        this.sunkShips = 0;
+        this.isGameOver = false;
 
+        //Creates board
+        for (let i = 0; i < size; i++) {
+            this.board[i] = [];
 
-export { Ship }
+            for (let j = 0; j < size; j++) {
+                this.board[i].push({ ship: null, marked: false });
+            }
+        }
+    }
+
+    setCell(x, y, ship) {
+        if (this.getShip(x, y) !== null) throw new Error('Cant place on a occupied cell');
+        this.board[x][y].ship = ship;
+    }
+
+    #getCell(x, y) {
+        this.#checkOutOfBounds();
+        return this.board[x][y];
+    }
+
+    getShip(x, y) {
+        return this.#getCell(x, y).ship;
+    }
+
+    getMarked() {
+        return this.#getCell(x, y).marked;
+    }
+
+    #checkOutOfBounds(x, y) {
+        if ((x < 0 || x >= this.size) || (y < 0 || y >= this.size)) {
+            throw new Error('Cant place on that position');
+        }
+    }
+
+    receiveAttack(x, y) {
+        const cell = this.#getCell(x, y);
+
+        if (cell.marked) throw new Error('Cant select twice a cell');
+        else if (cell.ship === null) cell.marked = true;
+        else {
+            cell.marked = true;
+            cell.ship.hit();
+            this.#handleSunkShips(cell.ship);
+        }
+    }
+
+    #handleSunkShips(ship) {
+        if (ship.isSunk()) {
+            this.sunkShips++;
+        }
+
+        if (this.sunkShips === this.ships) {
+            this.isGameOver = true;
+        }
+    }
+
+    getIsGameOver() {
+        return this.isGameOver;
+    }
+}
+
+export { Ship, Gameboard }
