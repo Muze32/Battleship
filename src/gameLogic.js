@@ -24,9 +24,10 @@ class Ship {
 class Gameboard {
     constructor(size = 10, ships = 5) {
         this.board = [];
+        this.size = size;
         this.ships = ships;
         this.sunkShips = 0;
-        this.isGameOver = false;
+        this.isGameOver = false;    
 
         //Creates board
         for (let i = 0; i < size; i++) {
@@ -36,6 +37,10 @@ class Gameboard {
                 this.board[i].push({ ship: null, marked: false });
             }
         }
+    }
+
+    getSize() {
+        return this.size;
     }
 
     setCell(x, y, ship) {
@@ -89,4 +94,15 @@ class Gameboard {
     }
 }
 
-export { Ship, Gameboard }
+class Player {
+    constructor(isCPU = false) {
+        this.isCPU = isCPU;
+        this.gameboard = new Gameboard();
+    }
+
+    getBoard() {
+        return this.gameboard;
+    }
+}
+
+export { Ship, Gameboard, Player }
