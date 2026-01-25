@@ -95,9 +95,9 @@ class Gameboard {
 }
 
 class Player {
-    constructor(isCPU = false) {
+    constructor(gameboard, isCPU = false) {
         this.isCPU = isCPU;
-        this.gameboard = new Gameboard();
+        this.gameboard = gameboard;
     }
 
     getBoard() {

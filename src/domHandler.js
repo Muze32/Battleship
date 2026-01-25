@@ -1,11 +1,11 @@
-import { Gameboard, Player } from "./gameLogic";
+import { Gameboard, Player, Ship } from "./gameLogic";
 
 let players;
 
 const createBoard = (player, boardDiv) => {
     const gameboard = player.getBoard();
     const size = gameboard.getSize();
-    for (let y = size - 1; y >= 0; y--) {
+    for (let y = 0; y < size; y++) {
         const rowDiv = document.createElement('div');
         for (let x = 0; x < size; x++) {
             const cellBtn = createCellBtn(x, y, player);
@@ -27,20 +27,25 @@ const createCellBtn = (x, y, player) => {
 const updateBoard = (gameboard, boardDiv) => {
     const size = gameboard.getSize();
     const rowDivs = boardDiv.children;
-    for (let y = size - 1; y >= 0; y--) {
+    for (let y = 0; y < size; y++) {
         const btns = rowDivs[y].children;
         for (let x = 0; x < size; x++) {
-            btns[x].textContent = gameboard.getShip(x, y);
+            const cellInfo = gameboard.getShip(x, y);
+            btns[x].textContent = cellInfo === null ? "Nope" : "Ship";
         }
     }
 
 };
 
 const startGame = () => {
-    const player1 = new Player();
-    const player2 = new Player(true);
+    const gameBoard = createTempBoard();
+    const gameBoard1 = createTempBoard();
+
+    const player1 = new Player(gameBoard);
+    const player2 = new Player(gameBoard1, true);
     const p1BoardDiv = document.getElementById('p1Board');
     const p2BoardDiv = document.getElementById('p2Board');
+
     createBoard(player1, p1BoardDiv);
     createBoard(player2, p2BoardDiv);
 
@@ -49,22 +54,31 @@ const startGame = () => {
 
 };
 
-const updateCell = (e, test) => {
-    const btn = e.target;
-    console.log(btn);
-    console.log(test);
+const createTempBoard = () => {
+    const board = new Gameboard();
+
+    for(let i = 0; i < 10; i ++) {
+        const ship = new Ship(1);
+        board.setCell(i, i, ship);
+    }
+
+    return board;
 };
 
-const test = (x, y) => {
-    let idlePlayer;
-    idlePlayer.getBoard().receiveAttack(x, y);
+const updateCell = (e, player) => {
+    const btn = e.target;
+    const board = player.getBoard();
+    const x = e.target.dataset.x, y = e.target.dataset.y;
+    board.receiveAttack(x, y);
 
-}
+    btn.classList.add("marked");
+    btn.disabled = true;
 
-const switchTurn = (currentPlayer) => {
-    if (!currentPlayer) currentPlayer = players[0];
-    currentPlayer = currentPlayer === players[0] ? players[1] : players[0];
-}
-
+    if(board.getShip(x, y) === null) {
+        btn.classList.add("water");
+    } else {
+        btn.classList.add("ship");
+    }
+};
 
 export { createBoard, updateBoard, startGame }
