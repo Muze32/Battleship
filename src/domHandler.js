@@ -1,7 +1,5 @@
 import { Gameboard, Player, Ship } from "./gameLogic";
 
-let players;
-
 const createBoard = (player, boardDiv) => {
     const gameboard = player.getBoard();
     const size = gameboard.getSize();
@@ -24,19 +22,6 @@ const createCellBtn = (x, y, player) => {
     return cellBtn;
 }
 
-const updateBoard = (gameboard, boardDiv) => {
-    const size = gameboard.getSize();
-    const rowDivs = boardDiv.children;
-    for (let y = 0; y < size; y++) {
-        const btns = rowDivs[y].children;
-        for (let x = 0; x < size; x++) {
-            const cellInfo = gameboard.getShip(x, y);
-            btns[x].textContent = cellInfo === null ? "Nope" : "Ship";
-        }
-    }
-
-};
-
 const startGame = () => {
     const gameBoard = createTempBoard();
     const gameBoard1 = createTempBoard();
@@ -48,16 +33,12 @@ const startGame = () => {
 
     createBoard(player1, p1BoardDiv);
     createBoard(player2, p2BoardDiv);
-
-    updateBoard(player1.getBoard(), p1BoardDiv);
-    updateBoard(player2.getBoard(), p2BoardDiv);
-
 };
 
 const createTempBoard = () => {
     const board = new Gameboard();
 
-    for(let i = 0; i < 10; i ++) {
+    for (let i = 0; i < 10; i++) {
         const ship = new Ship(1);
         board.setCell(i, i, ship);
     }
@@ -74,11 +55,11 @@ const updateCell = (e, player) => {
     btn.classList.add("marked");
     btn.disabled = true;
 
-    if(board.getShip(x, y) === null) {
+    if (board.getShip(x, y) === null) {
         btn.classList.add("water");
     } else {
         btn.classList.add("ship");
     }
 };
 
-export { createBoard, updateBoard, startGame }
+export { createBoard, startGame }
