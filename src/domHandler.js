@@ -1,5 +1,7 @@
 import { Gameboard, Player, Ship } from "./gameLogic";
 
+const players = [];
+
 const createBoard = (player, boardDiv) => {
     const gameboard = player.getBoard();
     const size = gameboard.getSize();
@@ -28,11 +30,14 @@ const startGame = () => {
 
     const player1 = new Player(gameBoard);
     const player2 = new Player(gameBoard1, true);
+    players.push(player1);
+    players.push(player2);
     const p1BoardDiv = document.getElementById('p1Board');
     const p2BoardDiv = document.getElementById('p2Board');
 
     createBoard(player1, p1BoardDiv);
     createBoard(player2, p2BoardDiv);
+    p2BoardDiv.classList.add("disabled");
 };
 
 const createTempBoard = () => {
@@ -56,10 +61,22 @@ const updateCell = (e, player) => {
     btn.disabled = true;
 
     if (board.getShip(x, y) === null) {
+        btn.textContent = "water";
         btn.classList.add("water");
     } else {
+        btn.textContent = "ship";
         btn.classList.add("ship");
     }
+
+    switchTurn();
 };
 
-export { createBoard, startGame }
+const switchTurn = () => {
+    const p1BoardDiv = document.getElementById('p1Board');
+    const p2BoardDiv = document.getElementById('p2Board');
+
+    p1BoardDiv.classList.toggle("disabled");
+    p2BoardDiv.classList.toggle("disabled");
+}
+
+export { startGame }
