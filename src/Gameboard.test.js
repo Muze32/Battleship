@@ -4,7 +4,7 @@ let gameboard, ship;
 
 //For testing purposes, the board will be 10x10 and will have a max of 2 ships
 beforeEach(() => {
-    gameboard = new Gameboard(10, 2);
+    gameboard = new Gameboard(2, 10);
     ship =  new Ship(1);
     gameboard.setCell(3, 4, ship);
 });
@@ -53,9 +53,9 @@ test('Game over when all the ships are sunk', () => {
     gameboard.setCell(2, 2, ship1);
 
     gameboard.receiveAttack(3, 4);
-    expect(gameboard.getIsGameOver()).toBeFalsy();
+    expect(gameboard.isGameOver()).toBeFalsy();
 
     gameboard.receiveAttack(2,2);
     expect(ship1.isSunk()).toBeTruthy();
-    expect(gameboard.getIsGameOver()).toBeTruthy();
+    expect(gameboard.isGameOver()).toBeTruthy();
 });
