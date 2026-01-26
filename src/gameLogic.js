@@ -22,12 +22,11 @@ class Ship {
 };
 
 class Gameboard {
-    constructor(size = 10, ships = 5) {
+    constructor(ships = 5, size = 10) {
         this.board = [];
         this.size = size;
         this.ships = ships;
         this.sunkShips = 0;
-        this.isGameOver = false;    
 
         //Creates board
         for (let i = 0; i < size; i++) {
@@ -75,22 +74,15 @@ class Gameboard {
         else {
             cell.marked = true;
             cell.ship.hit();
-            this.#handleSunkShips(cell.ship);
+
+            if (cell.ship.isSunk())
+                this.sunkShips++;
+
         }
     }
 
-    #handleSunkShips(ship) {
-        if (ship.isSunk()) {
-            this.sunkShips++;
-        }
-
-        if (this.sunkShips === this.ships) {
-            this.isGameOver = true;
-        }
-    }
-
-    getIsGameOver() {
-        return this.isGameOver;
+    isGameOver() {
+        return this.sunkShips === this.ships;
     }
 }
 
