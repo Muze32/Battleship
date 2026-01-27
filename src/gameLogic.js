@@ -1,7 +1,13 @@
 class Ship {
     constructor(length) {
+        this.isHorizontal = false;
         this.length = length;
+        this.timesPlaced = 0;
         this.numHits = 0;
+    }
+
+    incTimesPlaced() {
+        this.timesPlaced++;
     }
 
     hit() {
@@ -16,8 +22,24 @@ class Ship {
         return this.numHits;
     }
 
+    getLength() {
+        return this.length
+    }
+
+    getTimesPlaced() {
+        return this.timesPlaced;
+    }
+
     isSunk() {
         return this.length === this.numHits;
+    }
+
+    getIsHorizontal() {
+        return this.isHorizontal;
+    }
+
+    setIsHorizontal(direction) {
+        this.isHorizontal = direction;
     }
 };
 
@@ -44,11 +66,35 @@ class Gameboard {
 
     setCell(x, y, ship) {
         if (this.getShip(x, y) !== null) throw new Error('Cant place on a occupied cell');
+        if (ship.getTimesPlaced() === ship.getLength()) throw new Error('Cant place a ship more times than its length');
+        if (ship.getTimesPlaced() > 0 && !this.hasAdjacentCells(x, y, ship)) throw new Error('Cant place on a non adjacent cell');
+
+        //The direction of the ship will be decided after the first part is placed
+        if (ship.getTimesPlaced() === 1) {
+            if (this.getShip(x - 1, y) === ship || this.getShip(x + 1, y) === ship) {
+                ship.setIsHorizontal(true);
+            } else {
+                ship.setIsHorizontal(false);
+            }
+        }
+
         this.board[x][y].ship = ship;
+        ship.incTimesPlaced();
+    }
+
+    hasAdjacentCells(x, y, ship) {
+        //The possible moves changes depending if the direction of the ship is horizontal or vertical
+        const moves = ship.getIsHorizontal() === true ? [[-1, 0], [1, 0]] : [[0, -1], [0, 1]];
+
+        const possibleMoves = moves.map(([posX, posY]) => [x + posX, y + posY]);
+        const validMoves = possibleMoves.filter(([posX, posY]) => this.#isInBounds(posX, posY) &&
+            this.getShip(posX, posY) === ship);
+
+        return validMoves.length !== 0;
     }
 
     #getCell(x, y) {
-        this.#checkOutOfBounds();
+        this.#AssertInBounds();
         return this.board[x][y];
     }
 
@@ -56,14 +102,14 @@ class Gameboard {
         return this.#getCell(x, y).ship;
     }
 
-    getMarked() {
-        return this.#getCell(x, y).marked;
-    }
-
-    #checkOutOfBounds(x, y) {
+    #AssertInBounds(x, y) {
         if ((x < 0 || x >= this.size) || (y < 0 || y >= this.size)) {
             throw new Error('Cant place on that position');
         }
+    }
+
+    #isInBounds(x, y) {
+        return !((x < 0 || x >= this.size) || (y < 0 || y >= this.size));
     }
 
     receiveAttack(x, y) {

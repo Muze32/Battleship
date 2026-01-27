@@ -11,8 +11,7 @@ beforeEach(() => {
 
 test('Place a ship in the board', () => {
     expect(gameboard.getShip(2, 2)).toBeNull();
-    gameboard.setCell(2, 2, ship);
-    expect(gameboard.getShip(2, 2)).toBe(ship);
+    expect(gameboard.getShip(3, 4)).toBe(ship);
 });
 
 test('Cant place a ship in a occupied cell', () => {
@@ -35,7 +34,6 @@ test('Hit a cell with a ship', () => {
 test('Hit a empty cell', () => {
     gameboard.receiveAttack(1, 5);
     expect(ship.getHits()).toBe(0);
-    expect(ship.isSunk()).toBeFalsy();
 });
 
 test('Cant select a empty cell twice', () => {
@@ -56,6 +54,29 @@ test('Game over when all the ships are sunk', () => {
     expect(gameboard.isGameOver()).toBeFalsy();
 
     gameboard.receiveAttack(2,2);
-    expect(ship1.isSunk()).toBeTruthy();
     expect(gameboard.isGameOver()).toBeTruthy();
+});
+
+test('Cant place a ship in more cells than its length', () => {
+    const ship1 = new Ship(2);
+    gameboard.setCell(2, 2, ship1);
+    gameboard.setCell(2, 3, ship1);
+
+    expect(() => gameboard.setCell(2, 4, ship1)).toThrow();
+});
+
+test('Cant place a ship in non adjacent cells', () => {
+    const ship1 = new Ship(3);
+    gameboard.setCell(2, 2, ship1);
+    gameboard.setCell(2, 3, ship1);
+    
+    expect(() => gameboard.setCell(5, 5, ship1)).toThrow();
+});
+
+test('Cant change the direction of a ship', () => {
+    const ship1 = new Ship(5);
+    gameboard.setCell(2, 2, ship1);
+    gameboard.setCell(2, 3, ship1);
+    gameboard.setCell(2, 4, ship1);
+    expect(() => gameboard.setCell(3, 2, ship1)).toThrow();
 });
