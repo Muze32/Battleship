@@ -90,6 +90,12 @@ const resetGame = () => {
     p2BoardDiv.textContent = "";
     p1BoardDiv.classList.remove("disabled");
 
+    const boardsContainer = document.getElementById("boardsContainer");
+    boardsContainer.classList.remove("disabled");
+
+    const winDiv = document.getElementById("winDiv");
+    winDiv.textContent = '';
+
     startGame();
 };
 

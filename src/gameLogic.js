@@ -94,7 +94,7 @@ class Gameboard {
     }
 
     #getCell(x, y) {
-        this.#AssertInBounds();
+        this.#AssertInBounds(x, y);
         return this.board[x][y];
     }
 

@@ -77,6 +77,6 @@ test('Cant change the direction of a ship', () => {
     const ship1 = new Ship(5);
     gameboard.setCell(2, 2, ship1);
     gameboard.setCell(2, 3, ship1);
-    gameboard.setCell(2, 4, ship1);
+    
     expect(() => gameboard.setCell(3, 2, ship1)).toThrow();
 });
