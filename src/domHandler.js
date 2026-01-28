@@ -8,12 +8,10 @@ const createBoard = (player, boardDiv) => {
 
     //First creates cols then rows
     for (let y = 0; y < size; y++) {
-        const rowDiv = document.createElement('div');
         for (let x = 0; x < size; x++) {
             const cellBtn = createCellBtn(x, y, player);
-            rowDiv.appendChild(cellBtn);
+            boardDiv.appendChild(cellBtn);
         }
-        boardDiv.appendChild(rowDiv);
     }
 };
 
@@ -21,7 +19,7 @@ const createCellBtn = (x, y, player) => {
     const cellBtn = document.createElement('button');
     cellBtn.dataset.x = x;
     cellBtn.dataset.y = y;
-    cellBtn.textContent = "suisei";
+    cellBtn.classList.add("cellBtn");
     cellBtn.addEventListener('click', (e) => updateCell(e, player));
     return cellBtn;
 };
@@ -37,25 +35,27 @@ const updateCell = (e, player) => {
 
     //Checks if the coordinate was water or a ship
     if (board.getShip(x, y) === null) {
-        btn.textContent = "water";
         btn.classList.add("water");
     } else {
-        btn.textContent = "ship";
         btn.classList.add("ship");
     }
 
+    btn.textContent = "X";
     //Checks if the game is over
     if (board.isGameOver()) {
         handleEndGame(player);
     } else {
-        switchTurn();
+        switchTurn(player);
     }
 };
 
-const switchTurn = () => {
+const switchTurn = (player) => {
     const p1BoardDiv = document.getElementById('p1Board');
     const p2BoardDiv = document.getElementById('p2Board');
+    const stringPlayer = player === players[0] ? "Player 2" : "Player 1";
+    const playerTurnDiv = document.getElementById("playerTurnDiv");
 
+    playerTurnDiv.textContent = `${stringPlayer} turn: `
     p1BoardDiv.classList.toggle("disabled");
     p2BoardDiv.classList.toggle("disabled");
 };

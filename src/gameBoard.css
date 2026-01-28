@@ -1,0 +1,35 @@
+.disabled {
+    pointer-events: none;
+}   
+
+#boardsContainer {
+    display: flex;
+    justify-content: space-around;
+}
+
+.boardDiv {
+    margin-top: 1rem;
+    display: grid;
+    grid-template: repeat(10, 1fr) / repeat(10, 1fr);
+}
+
+/****************CELLS**********************/
+
+.cellBtn {
+    background: none;
+    min-width: 2rem;
+    min-height: 2rem;
+    box-sizing: content-box;
+}
+
+.cellBtn:hover {
+    background-color: green;
+}
+
+.water {
+    color: red;
+}
+
+.ship {
+    color: green;
+}

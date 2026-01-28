@@ -1,4 +1,4 @@
 import { startGame } from "./domHandler";
-import "./test.css";
+import "./gameBoard.css";
 
 startGame();
