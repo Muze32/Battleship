@@ -15,15 +15,17 @@ const createBoard = (player, boardContainer) => {
 
     for (let letter of letters) {
         const letterSpan = document.createElement("span");
+        letterSpan.classList.add("cellLetter");
         letterSpan.textContent = letter;
         boardDiv.appendChild(letterSpan);
     }
 
     //First creates cols then rows
     for (let y = 0; y < size; y++) {
-        const rowNumberSpan = document.createElement('span');
-        rowNumberSpan.textContent = y;
-        boardDiv.appendChild(rowNumberSpan);
+        const numberSpan = document.createElement('span');
+        numberSpan.classList.add("cellNumber");
+        numberSpan.textContent = y;
+        boardDiv.appendChild(numberSpan);
 
         for (let x = 0; x < size; x++) {
             const cellBtn = createCellBtn(x, y, player);

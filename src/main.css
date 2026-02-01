@@ -1,0 +1,33 @@
+body {
+    margin: 0;
+    box-sizing: content-box;
+}
+
+body {
+    background-color: #42414d;
+    color: white;
+}
+
+.title {
+    background-color: black;
+    color: white;
+    padding: 1rem;
+    margin-top: 0;
+}
+
+#playerTurnDiv {
+    display: flex;
+    justify-content: center;
+    font-size: xx-large;
+}
+
+/*****RESET BUTTON*********/
+
+.resetBtnDiv {
+    display: flex;
+    justify-content: center;
+}
+
+.resetBtn {
+    
+}

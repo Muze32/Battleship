@@ -1,6 +1,8 @@
+/**************BOARDS************************/
+
 .disabled {
     pointer-events: none;
-}   
+}
 
 #boardsContainer {
     display: flex;
@@ -32,4 +34,11 @@
 
 .ship {
     color: green;
+}
+
+.cellLetter,
+.cellNumber {
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
