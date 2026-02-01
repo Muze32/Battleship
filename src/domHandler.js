@@ -2,17 +2,35 @@ import { Gameboard, Player, Ship } from "./gameLogic";
 
 let players = [];
 
-const createBoard = (player, boardDiv) => {
+const createBoard = (player, boardContainer) => {
+    const boardDiv = document.createElement("div");
+    boardDiv.classList.add("boardDiv");
+
     const gameboard = player.getBoard();
     const size = gameboard.getSize();
+    const letters = "ABCDEFGHIJ";
+
+    //Add a empty cell at the top left
+    boardDiv.appendChild(document.createElement("span"));
+
+    for (let letter of letters) {
+        const letterSpan = document.createElement("span");
+        letterSpan.textContent = letter;
+        boardDiv.appendChild(letterSpan);
+    }
 
     //First creates cols then rows
     for (let y = 0; y < size; y++) {
+        const rowNumberSpan = document.createElement('span');
+        rowNumberSpan.textContent = y;
+        boardDiv.appendChild(rowNumberSpan);
+
         for (let x = 0; x < size; x++) {
             const cellBtn = createCellBtn(x, y, player);
             boardDiv.appendChild(cellBtn);
         }
     }
+    boardContainer.appendChild(boardDiv);
 };
 
 const createCellBtn = (x, y, player) => {
@@ -50,14 +68,14 @@ const updateCell = (e, player) => {
 };
 
 const switchTurn = (player) => {
-    const p1BoardDiv = document.getElementById('p1Board');
-    const p2BoardDiv = document.getElementById('p2Board');
+    const p1BoardContainer = document.getElementById('p1BoardContainer');
+    const p2BoardContainer = document.getElementById('p2BoardContainer');
     const stringPlayer = player === players[0] ? "Player 2" : "Player 1";
     const playerTurnDiv = document.getElementById("playerTurnDiv");
 
     playerTurnDiv.textContent = `${stringPlayer} turn: `
-    p1BoardDiv.classList.toggle("disabled");
-    p2BoardDiv.classList.toggle("disabled");
+    p1BoardContainer.classList.toggle("disabled");
+    p2BoardContainer.classList.toggle("disabled");
 };
 
 const startGame = () => {
@@ -72,12 +90,13 @@ const startGame = () => {
 };
 
 const updateDOMElements = (player1, player2) => {
-    const p1BoardDiv = document.getElementById('p1Board');
-    const p2BoardDiv = document.getElementById('p2Board');
-    p2BoardDiv.classList.add("disabled");
+    const p1BoardContainer = document.getElementById('p1BoardContainer');
+    const p2BoardContainer = document.getElementById('p2BoardContainer');
 
-    createBoard(player1, p1BoardDiv);
-    createBoard(player2, p2BoardDiv);
+    p2BoardContainer.classList.add("disabled");
+
+    createBoard(player1, p1BoardContainer);
+    createBoard(player2, p2BoardContainer);
 
     const resetBtn = document.getElementById("resetBtn");
     resetBtn.addEventListener("click", resetGame);
@@ -96,6 +115,8 @@ const resetGame = () => {
     const winDiv = document.getElementById("winDiv");
     winDiv.textContent = '';
 
+    const playerTurnDiv = document.getElementById("playerTurnDiv");
+    playerTurnDiv.textContent = "Player 1 turn: ";
     startGame();
 };
 

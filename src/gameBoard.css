@@ -10,7 +10,7 @@
 .boardDiv {
     margin-top: 1rem;
     display: grid;
-    grid-template: repeat(10, 1fr) / repeat(10, 1fr);
+    grid-template: repeat(11, 1fr) / repeat(11, 1fr);
 }
 
 /****************CELLS**********************/
