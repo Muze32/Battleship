@@ -51,11 +51,11 @@ class Gameboard {
         this.sunkShips = 0;
 
         //Creates board
-        for (let i = 0; i < size; i++) {
-            this.board[i] = [];
+        for (let y = 0; y < size; y++) {
+            this.board[y] = [];
 
-            for (let j = 0; j < size; j++) {
-                this.board[i].push({ ship: null, marked: false });
+            for (let x = 0; x < size; x++) {
+                this.board[y].push({ ship: null, marked: false });
             }
         }
     }

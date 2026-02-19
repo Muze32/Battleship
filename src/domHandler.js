@@ -2,7 +2,8 @@ import { Gameboard, Player, Ship, CPU } from "./gameLogic";
 
 const game = {
     mode: null,
-    turn: 1
+    turn: 1,
+    cpu: null
 };
 
 const createBoard = (player, boardDiv) => {
@@ -46,10 +47,11 @@ const createCellBtn = (x, y, player) => {
 const updateCell = (e, player) => {
     const btn = e.target;
     const board = player.getBoard();
-    const x = e.target.dataset.x, y = e.target.dataset.y;
+    const x = btn.dataset.x, y = btn.dataset.y;
     board.receiveAttack(x, y);
 
     btn.classList.add("disabled");
+    btn.textContent = "X";
 
     //Checks if the coordinate was water or a ship
     if (board.getShip(x, y) === null) {
@@ -58,7 +60,6 @@ const updateCell = (e, player) => {
         btn.classList.add("ship");
     }
 
-    btn.textContent = "X";
     //Checks if the game is over
     if (board.isGameOver()) {
         handleEndGame();
@@ -67,17 +68,49 @@ const updateCell = (e, player) => {
     }
 };
 
-const switchTurn = () => {
+const switchTurn = async () => {
     const p1BoardDiv = document.getElementById('p1BoardDiv');
     const p2BoardDiv = document.getElementById('p2BoardDiv');
-    const stringPlayer = game.turn === 1 ? "Player 2" : "Player 1";
+    let stringPlayer;
     const playerTurnH1 = document.getElementById("playerTurnH1");
 
+    //Switchs turn
     game.turn = game.turn === 1 ? 2 : 1;
 
-    playerTurnH1.textContent = `${stringPlayer} turn`
-    p1BoardDiv.classList.toggle("disabled");
-    p2BoardDiv.classList.toggle("disabled");
+    //Updates stringPlayer
+    if (game.mode === "cpu" && game.turn === 2) {
+        stringPlayer = "CPU";
+    } else {
+        stringPlayer = game.turn === 1 ? "Player 1" : "Player 2";
+    }
+
+    //Updates player turn on screen
+    playerTurnH1.textContent = `${stringPlayer} turn`;
+
+    if (game.mode === "cpu" && game.turn === 2) {
+        p1BoardDiv.classList.add("disabled");
+        p2BoardDiv.classList.add("disabled");
+
+        //The delay will take a random value between 750ms and 2500 ms
+        const randomDelayms = Math.floor(Math.random() * (2500 - 750)) + 750;
+        await delay(randomDelayms);
+        playCPUMove();
+    }
+    else if (game.mode === "cpu" && game.turn === 1) {
+        p1BoardDiv.classList.remove("disabled");
+    } else {
+        p1BoardDiv.classList.toggle("disabled");
+        p2BoardDiv.classList.toggle("disabled");
+    }
+};
+
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+const playCPUMove = () => {
+    const move = game.cpu.getMove();
+    const container = document.getElementById("p2BoardDiv");
+    const btn = container.querySelector(`[data-x="${move.x}"][data-y="${move.y}"]`);
+    btn.click();
 };
 
 const setupGame = () => {
@@ -88,31 +121,29 @@ const setupGame = () => {
     const player2Btn = document.getElementById("player2Btn");
 
     cpuBtn.addEventListener("click", () => {
-        startGame("cpu");
+        game.mode = "cpu";
+        startGame();
         dialog.close();
     });
 
     player2Btn.addEventListener("click", () => {
-        startGame("player2");
+        game.mode = "player2";
+        startGame();
         dialog.close();
     });
 };
 
-const startGame = (player) => {
+const startGame = () => {
     const gameBoard = createTempBoard();
     const gameBoard1 = createTempBoard();
     const player1 = new Player(gameBoard);
-    let player2;
+    const player2 = game.mode === "cpu" ? new CPU(gameBoard1) : new Player(gameBoard1);
 
-    if (player === "cpu") {
-        game.mode = "cpu";
-        player2 = new CPU(gameBoard1);
-    } else {
-        game.mode = "player2";
-        player2 = new Player(gameBoard1);
+    if (game.mode === "cpu") {
+        game.cpu = player2;
     }
-
     game.turn = 1;
+
     updateDOMElements(player1, player2);
 };
 
@@ -126,7 +157,7 @@ const updateDOMElements = (player1, player2) => {
     createBoard(player2, p2BoardDiv);
 
     const resetBtn = document.getElementById("resetBtn");
-    resetBtn.addEventListener("click", resetGame);
+    resetBtn.onclick = resetGame;
 };
 
 const resetGame = () => {
@@ -145,7 +176,9 @@ const resetGame = () => {
 
     const playerTurnH1 = document.getElementById("playerTurnH1");
     playerTurnH1.textContent = "Player 1 turn";
-    startGame();
+
+    const dialog = document.querySelector("dialog");
+    dialog.showModal();
 };
 
 const createTempBoard = () => {
@@ -164,7 +197,13 @@ const handleEndGame = () => {
     boardsContainer.classList.add("disabled");
 
     //Checks which player won
-    const stringPlayer = game.turn === 1 ? "Player 1" : "Player 2";
+    let stringPlayer;
+
+    if (game.mode === "cpu" && game.turn === 2) {
+        stringPlayer = "CPU";
+    } else {
+        stringPlayer = game.turn === 1 ? "Player 1" : "Player 2";
+    }
 
     const winH2 = document.getElementById("winH2");
     winH2.textContent = `${stringPlayer} won the match. Good game!`;
