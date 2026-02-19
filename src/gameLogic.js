@@ -148,8 +148,7 @@ class Gameboard {
 }
 
 class Player {
-    constructor(gameboard, isCPU = false) {
-        this.isCPU = isCPU;
+    constructor(gameboard) {
         this.gameboard = gameboard;
     }
 
@@ -158,4 +157,21 @@ class Player {
     }
 }
 
-export { Ship, Gameboard, Player }
+class CPU {
+    constructor(board, randomFn = Math.random) {
+        this.board = board;
+        this.randomFn = randomFn;
+    }
+
+    getMove() {
+        const available = this.board.getAvailableCells();
+        const randomIndex = Math.floor(this.randomFn() * available.length);
+        return available[randomIndex];
+    }
+
+    getBoard() {
+        return this.board;
+    }
+}
+
+export { Ship, Gameboard, Player, CPU }

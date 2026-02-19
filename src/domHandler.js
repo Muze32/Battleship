@@ -1,11 +1,11 @@
-import { Gameboard, Player, Ship } from "./gameLogic";
+import { Gameboard, Player, Ship, CPU } from "./gameLogic";
 
-let players = [];
+const game = {
+    mode: null,
+    turn: 1
+};
 
-const createBoard = (player, boardContainer) => {
-    const boardDiv = document.createElement("div");
-    boardDiv.classList.add("boardDiv");
-
+const createBoard = (player, boardDiv) => {
     const gameboard = player.getBoard();
     const size = gameboard.getSize();
     const letters = "ABCDEFGHIJ";
@@ -32,7 +32,6 @@ const createBoard = (player, boardContainer) => {
             boardDiv.appendChild(cellBtn);
         }
     }
-    boardContainer.appendChild(boardDiv);
 };
 
 const createCellBtn = (x, y, player) => {
@@ -62,50 +61,78 @@ const updateCell = (e, player) => {
     btn.textContent = "X";
     //Checks if the game is over
     if (board.isGameOver()) {
-        handleEndGame(player);
+        handleEndGame();
     } else {
-        switchTurn(player);
+        switchTurn();
     }
 };
 
-const switchTurn = (player) => {
-    const p1BoardContainer = document.getElementById('p1BoardContainer');
-    const p2BoardContainer = document.getElementById('p2BoardContainer');
-    const stringPlayer = player === players[0] ? "Player 2" : "Player 1";
+const switchTurn = () => {
+    const p1BoardDiv = document.getElementById('p1BoardDiv');
+    const p2BoardDiv = document.getElementById('p2BoardDiv');
+    const stringPlayer = game.turn === 1 ? "Player 2" : "Player 1";
     const playerTurnH1 = document.getElementById("playerTurnH1");
 
+    game.turn = game.turn === 1 ? 2 : 1;
+
     playerTurnH1.textContent = `${stringPlayer} turn`
-    p1BoardContainer.classList.toggle("disabled");
-    p2BoardContainer.classList.toggle("disabled");
+    p1BoardDiv.classList.toggle("disabled");
+    p2BoardDiv.classList.toggle("disabled");
 };
 
-const startGame = () => {
+const setupGame = () => {
+    const dialog = document.querySelector("dialog");
+    dialog.showModal();
+
+    const cpuBtn = document.getElementById("cpuBtn");
+    const player2Btn = document.getElementById("player2Btn");
+
+    cpuBtn.addEventListener("click", () => {
+        startGame("cpu");
+        dialog.close();
+    });
+
+    player2Btn.addEventListener("click", () => {
+        startGame("player2");
+        dialog.close();
+    });
+};
+
+const startGame = (player) => {
     const gameBoard = createTempBoard();
     const gameBoard1 = createTempBoard();
     const player1 = new Player(gameBoard);
-    const player2 = new Player(gameBoard1, true);
+    let player2;
 
-    players = [player1, player2];
+    if (player === "cpu") {
+        game.mode = "cpu";
+        player2 = new CPU(gameBoard1);
+    } else {
+        game.mode = "player2";
+        player2 = new Player(gameBoard1);
+    }
 
+    game.turn = 1;
     updateDOMElements(player1, player2);
 };
 
 const updateDOMElements = (player1, player2) => {
-    const p1BoardContainer = document.getElementById('p1BoardContainer');
-    const p2BoardContainer = document.getElementById('p2BoardContainer');
+    const p1BoardDiv = document.getElementById('p1BoardDiv');
+    const p2BoardDiv = document.getElementById('p2BoardDiv');
 
-    p2BoardContainer.classList.add("disabled");
+    p2BoardDiv.classList.add("disabled");
 
-    createBoard(player1, p1BoardContainer);
-    createBoard(player2, p2BoardContainer);
+    createBoard(player1, p1BoardDiv);
+    createBoard(player2, p2BoardDiv);
 
     const resetBtn = document.getElementById("resetBtn");
     resetBtn.addEventListener("click", resetGame);
 };
 
 const resetGame = () => {
-    const p1BoardDiv = document.getElementById('p1BoardContainer');
-    const p2BoardDiv = document.getElementById('p2BoardContainer');
+    const p1BoardDiv = document.getElementById('p1BoardDiv');
+    const p2BoardDiv = document.getElementById('p2BoardDiv');
+
     p1BoardDiv.textContent = "";
     p2BoardDiv.textContent = "";
     p1BoardDiv.classList.remove("disabled");
@@ -132,15 +159,15 @@ const createTempBoard = () => {
     return board;
 };
 
-const handleEndGame = (player) => {
+const handleEndGame = () => {
     const boardsContainer = document.getElementById("boardsContainer");
     boardsContainer.classList.add("disabled");
 
     //Checks which player won
-    const stringPlayer = player === players[0] ? "Player 1" : "Player 2";
+    const stringPlayer = game.turn === 1 ? "Player 1" : "Player 2";
 
     const winH2 = document.getElementById("winH2");
     winH2.textContent = `${stringPlayer} won the match. Good game!`;
 };
 
-export { startGame }
+export { setupGame }
