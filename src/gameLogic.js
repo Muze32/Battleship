@@ -130,6 +130,21 @@ class Gameboard {
     isGameOver() {
         return this.sunkShips === this.ships;
     }
+
+    getAvailableCells() {
+        const available = [];
+
+        for (let y = 0; y < this.size; y++) {
+            for (let x = 0; x < this.size; x++) {
+                const cell = this.#getCell(x, y);
+
+                if (!cell.marked)
+                    available.push({ x, y });
+            }
+        }
+
+        return available;
+    }
 }
 
 class Player {
