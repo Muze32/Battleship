@@ -50,8 +50,7 @@ const updateCell = (e, player) => {
     const x = e.target.dataset.x, y = e.target.dataset.y;
     board.receiveAttack(x, y);
 
-    btn.classList.add("marked");
-    btn.disabled = true;
+    btn.classList.add("disabled");
 
     //Checks if the coordinate was water or a ship
     if (board.getShip(x, y) === null) {
@@ -73,9 +72,9 @@ const switchTurn = (player) => {
     const p1BoardContainer = document.getElementById('p1BoardContainer');
     const p2BoardContainer = document.getElementById('p2BoardContainer');
     const stringPlayer = player === players[0] ? "Player 2" : "Player 1";
-    const playerTurnDiv = document.getElementById("playerTurnDiv");
+    const playerTurnH1 = document.getElementById("playerTurnH1");
 
-    playerTurnDiv.textContent = `${stringPlayer} turn: `
+    playerTurnH1.textContent = `${stringPlayer} turn`
     p1BoardContainer.classList.toggle("disabled");
     p2BoardContainer.classList.toggle("disabled");
 };
@@ -105,8 +104,8 @@ const updateDOMElements = (player1, player2) => {
 };
 
 const resetGame = () => {
-    const p1BoardDiv = document.getElementById('p1Board');
-    const p2BoardDiv = document.getElementById('p2Board');
+    const p1BoardDiv = document.getElementById('p1BoardContainer');
+    const p2BoardDiv = document.getElementById('p2BoardContainer');
     p1BoardDiv.textContent = "";
     p2BoardDiv.textContent = "";
     p1BoardDiv.classList.remove("disabled");
@@ -114,11 +113,11 @@ const resetGame = () => {
     const boardsContainer = document.getElementById("boardsContainer");
     boardsContainer.classList.remove("disabled");
 
-    const winDiv = document.getElementById("winDiv");
-    winDiv.textContent = '';
+    const winH2 = document.getElementById("winH2");
+    winH2.textContent = '';
 
-    const playerTurnDiv = document.getElementById("playerTurnDiv");
-    playerTurnDiv.textContent = "Player 1 turn: ";
+    const playerTurnH1 = document.getElementById("playerTurnH1");
+    playerTurnH1.textContent = "Player 1 turn";
     startGame();
 };
 
@@ -140,8 +139,8 @@ const handleEndGame = (player) => {
     //Checks which player won
     const stringPlayer = player === players[0] ? "Player 1" : "Player 2";
 
-    const winDiv = document.getElementById("winDiv");
-    winDiv.textContent = `${stringPlayer} won the match. Good game!`;
+    const winH2 = document.getElementById("winH2");
+    winH2.textContent = `${stringPlayer} won the match. Good game!`;
 };
 
 export { startGame }

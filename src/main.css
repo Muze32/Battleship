@@ -1,33 +1,46 @@
 body {
     margin: 0;
     box-sizing: content-box;
+    color: white;
+    background-color: #42414d;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-body {
-    background-color: #42414d;
-    color: white;
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 2rem 0;
 }
 
 .title {
     background-color: black;
     color: white;
-    padding: 1rem;
-    margin-top: 0;
+    padding: 1.5rem;
+    margin: 0;
 }
 
-#playerTurnDiv {
-    display: flex;
-    justify-content: center;
-    font-size: xx-large;
+#playerTurnH1 {
+    margin: 0;
 }
 
 /*****RESET BUTTON*********/
 
-.resetBtnDiv {
+.resetBtnDiv, #winH2, #playerTurnH1 {
     display: flex;
     justify-content: center;
 }
 
 .resetBtn {
-    
+    padding: .85rem;
+    font-size: 1rem;
+    border-radius: 8px;
+}
+
+.resetBtn:hover {
+    background-color: red;
+    color: white;
 }

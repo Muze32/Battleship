@@ -1,3 +1,8 @@
+:root {
+    --hit-color: #38dd38;
+    --failed-color: #5a93ff;
+}
+
 /**************BOARDS************************/
 
 .disabled {
@@ -22,18 +27,23 @@
     min-width: 2rem;
     min-height: 2rem;
     box-sizing: content-box;
+    font-size: 15px;
 }
 
 .cellBtn:hover {
-    background-color: green;
+    background-color: #d12222;
 }
 
 .water {
-    color: red;
+    color: var(--failed-color);
+    border-color: var(--failed-color);
+    background-color: #5a93ff4d;
 }
 
 .ship {
-    color: green;
+    color: var(--hit-color);
+    border-color: var(--hit-color);
+    background-color: #38dd3840;
 }
 
 .cellLetter,
