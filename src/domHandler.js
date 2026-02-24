@@ -30,6 +30,9 @@ const createBoard = (player, boardDiv) => {
 
         for (let x = 0; x < size; x++) {
             const cellBtn = createCellBtn(x, y, player);
+            if (gameboard.getShip(x, y)) {
+                cellBtn.classList.add("ship");
+            }
             boardDiv.appendChild(cellBtn);
         }
     }
@@ -55,9 +58,10 @@ const updateCell = (e, player) => {
 
     //Checks if the coordinate was water or a ship
     if (!board.getShip(x, y)) {
-        btn.classList.add("water");
+        btn.classList.add("miss");
     } else {
-        btn.classList.add("ship");
+        btn.classList.remove("ship");
+        btn.classList.add("hit");
     }
 
     //Checks if the game is over
@@ -91,6 +95,9 @@ const switchTurn = async () => {
     if (game.mode !== "cpu") {
         p1BoardDiv.classList.toggle("disabled");
         p2BoardDiv.classList.toggle("disabled");
+
+        p1BoardDiv.classList.toggle("visible");
+        p2BoardDiv.classList.toggle("visible");
         return;
     }
 
@@ -156,7 +163,7 @@ const updateDOMElements = (player1, player2) => {
     const p1BoardDiv = document.getElementById('p1BoardDiv');
     const p2BoardDiv = document.getElementById('p2BoardDiv');
 
-    p1BoardDiv.classList.add("disabled");
+    p1BoardDiv.classList.add("disabled", "visible");
 
     createBoard(player1, p1BoardDiv);
     createBoard(player2, p2BoardDiv);
@@ -171,7 +178,7 @@ const resetGame = () => {
 
     p1BoardDiv.textContent = "";
     p2BoardDiv.textContent = "";
-    p1BoardDiv.classList.remove("disabled");
+    p2BoardDiv.classList.remove("disabled");
 
     const boardsContainer = document.getElementById("boardsContainer");
     boardsContainer.classList.remove("disabled");

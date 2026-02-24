@@ -31,19 +31,25 @@
 }
 
 .cellBtn:hover {
-    background-color: #d12222;
+    background-color: #9797a0;
 }
 
-.water {
+.miss {
     color: var(--failed-color);
     border-color: var(--failed-color);
     background-color: #5a93ff4d;
 }
 
-.ship {
+.visible > .ship {
     color: var(--hit-color);
     border-color: var(--hit-color);
     background-color: #38dd3840;
+}
+
+.hit {
+    color: black;
+    border-color: #e63d3d;
+    background-color: #e63d3d;
 }
 
 .cellLetter,
