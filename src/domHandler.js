@@ -54,7 +54,7 @@ const updateCell = (e, player) => {
     btn.textContent = "X";
 
     //Checks if the coordinate was water or a ship
-    if (board.getShip(x, y) === null) {
+    if (!board.getShip(x, y)) {
         btn.classList.add("water");
     } else {
         btn.classList.add("ship");
@@ -71,8 +71,8 @@ const updateCell = (e, player) => {
 const switchTurn = async () => {
     const p1BoardDiv = document.getElementById('p1BoardDiv');
     const p2BoardDiv = document.getElementById('p2BoardDiv');
-    let stringPlayer;
     const playerTurnH1 = document.getElementById("playerTurnH1");
+    let stringPlayer;
 
     //Switchs turn
     game.turn = game.turn === 1 ? 2 : 1;
@@ -87,7 +87,15 @@ const switchTurn = async () => {
     //Updates player turn on screen
     playerTurnH1.textContent = `${stringPlayer} turn`;
 
-    if (game.mode === "cpu" && game.turn === 2) {
+    //If the game mode is two players
+    if (game.mode !== "cpu") {
+        p1BoardDiv.classList.toggle("disabled");
+        p2BoardDiv.classList.toggle("disabled");
+        return;
+    }
+
+    //If it is the CPU turn
+    if (game.turn === 2) {
         p1BoardDiv.classList.add("disabled");
         p2BoardDiv.classList.add("disabled");
 
@@ -95,12 +103,8 @@ const switchTurn = async () => {
         const randomDelayms = Math.floor(Math.random() * (2500 - 750)) + 750;
         await delay(randomDelayms);
         playCPUMove();
-    }
-    else if (game.mode === "cpu" && game.turn === 1) {
-        p1BoardDiv.classList.remove("disabled");
     } else {
-        p1BoardDiv.classList.toggle("disabled");
-        p2BoardDiv.classList.toggle("disabled");
+        p2BoardDiv.classList.remove("disabled");
     }
 };
 
@@ -108,7 +112,7 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 const playCPUMove = () => {
     const move = game.cpu.getMove();
-    const container = document.getElementById("p2BoardDiv");
+    const container = document.getElementById("p1BoardDiv");
     const btn = container.querySelector(`[data-x="${move.x}"][data-y="${move.y}"]`);
     btn.click();
 };
@@ -142,6 +146,7 @@ const startGame = () => {
     if (game.mode === "cpu") {
         game.cpu = player2;
     }
+
     game.turn = 1;
 
     updateDOMElements(player1, player2);
@@ -151,7 +156,7 @@ const updateDOMElements = (player1, player2) => {
     const p1BoardDiv = document.getElementById('p1BoardDiv');
     const p2BoardDiv = document.getElementById('p2BoardDiv');
 
-    p2BoardDiv.classList.add("disabled");
+    p1BoardDiv.classList.add("disabled");
 
     createBoard(player1, p1BoardDiv);
     createBoard(player2, p2BoardDiv);
