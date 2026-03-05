@@ -34,7 +34,7 @@ class Ship {
         return this.length === this.numHits;
     }
 
-    getIsHorizontal() {
+    isHorizontal() {
         return this.isHorizontal;
     }
 
@@ -84,28 +84,48 @@ class Gameboard {
 
     hasAdjacentCells(x, y, ship) {
         //The possible moves changes depending if the direction of the ship is horizontal or vertical
-        const moves = ship.getIsHorizontal() === true ? [[-1, 0], [1, 0]] : [[0, -1], [0, 1]];
+        const moves = ship.isHorizontal() === true ? [[-1, 0], [1, 0]] : [[0, -1], [0, 1]];
 
         const possibleMoves = moves.map(([posX, posY]) => [x + posX, y + posY]);
-        const validMoves = possibleMoves.filter(([posX, posY]) => this.#isInBounds(posX, posY) &&
-            this.getShip(posX, posY) === ship);
 
-        return validMoves.length !== 0;
+        for (const [newX, newY] of possibleMoves) {
+            const foundShip = this.getShip(newX, newY);
+
+            if (foundShip === ship) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    #getCell(x, y) {
-        this.#AssertInBounds(x, y);
-        return this.board[x][y];
+    hasNearShips(x, y, ship = null) {
+        const moves = [[-1, -1], [1, 1], [1, -1], [-1, 1], [0, 1], [0, -1], [1, 0], [-1, 0]];
+        const possibleMoves = moves.map(([posX, posY]) => [x + posX, y + posY]);
+
+        for (const [newX, newY] of possibleMoves) {
+            const foundShip = this.getShip(newX, newY);
+
+            if (foundShip && ship && foundShip !== ship) {
+                return true;
+            }
+        }
+        return false;
     }
 
     getShip(x, y) {
-        return this.#getCell(x, y).ship;
+        if (!this.#isInBounds(x, y)) return null;
+        return this.board[x][y].ship;
     }
 
-    #AssertInBounds(x, y) {
-        if ((x < 0 || x >= this.size) || (y < 0 || y >= this.size)) {
-            throw new Error('Cant place on that position');
-        }
+    getMarked(x, y) {
+        if (!this.#isInBounds(x, y)) return null;
+        return this.board[x][y].marked;
+    }
+
+    setMarked(x, y) {
+        if (!this.#isInBounds(x, y)) return;
+        this.board[x][y].marked = true;
     }
 
     #isInBounds(x, y) {
@@ -113,17 +133,17 @@ class Gameboard {
     }
 
     receiveAttack(x, y) {
-        const cell = this.#getCell(x, y);
+        const ship = this.getShip(x, y);
+        let marked = this.getMarked(x, y);
 
-        if (cell.marked) throw new Error('Cant select twice a cell');
-        else if (cell.ship === null) cell.marked = true;
+        if (marked) throw new Error('Cant select twice a cell');
+        else if (!ship) this.setMarked(x, y);
         else {
-            cell.marked = true;
-            cell.ship.hit();
+            this.setMarked(x, y);
+            ship.hit();
 
-            if (cell.ship.isSunk())
+            if (ship.isSunk())
                 this.sunkShips++;
-
         }
     }
 
@@ -131,20 +151,43 @@ class Gameboard {
         return this.sunkShips === this.ships;
     }
 
-    getAvailableCells() {
+    getLonelyCells() {
         const available = [];
-
         for (let y = 0; y < this.size; y++) {
             for (let x = 0; x < this.size; x++) {
-                const cell = this.#getCell(x, y);
+                const marked = this.getMarked(x, y);
 
-                if (!cell.marked)
+                if (!marked && !this.hasNearShips(x, y))
                     available.push({ x, y });
             }
         }
-
         return available;
     }
+
+    #generateRandomArray(max, array = null) {
+        if (array === null) {
+            array = Array.from({ length: max }, (_, i) => i + 1);
+        }
+
+        for (let i = array.length - 1; i > 0; i--) {
+            const randomIndex = Math.floor(Math.random() * (i + 1));
+
+            // Intercambiar posiciones
+            [array[i], array[randomIndex]] = [array[randomIndex], array[i]];
+        }
+
+        return array;
+    }
+
+    placeRandomShips(max = this.ships) {
+        const randomShipSizes = this.#generateRandomArray(max);
+        const possibleMoves = this.getLonelyCells();
+        const randomMoves = this.#generateRandomArray(max, possibleMoves);
+
+
+        console.log("a");
+    }
+
 }
 
 class Player {
@@ -164,7 +207,7 @@ class CPU {
     }
 
     getMove() {
-        const available = this.board.getAvailableCells();
+        const available = this.board.getLonelyCells();
         const randomIndex = Math.floor(this.randomFn() * available.length);
         return available[randomIndex];
     }

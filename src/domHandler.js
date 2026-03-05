@@ -25,7 +25,7 @@ const createBoard = (player, boardDiv) => {
     for (let y = 0; y < size; y++) {
         const numberSpan = document.createElement('span');
         numberSpan.classList.add("cellNumber");
-        numberSpan.textContent = y;
+        numberSpan.textContent = y + 1;
         boardDiv.appendChild(numberSpan);
 
         for (let x = 0; x < size; x++) {
@@ -147,6 +147,7 @@ const setupGame = () => {
 const startGame = () => {
     const gameBoard = createTempBoard();
     const gameBoard1 = createTempBoard();
+    //gameBoard.placeRandomShips();
     const player1 = new Player(gameBoard);
     const player2 = game.mode === "cpu" ? new CPU(gameBoard1) : new Player(gameBoard1);
 
@@ -200,7 +201,8 @@ const createTempBoard = () => {
         const ship = new Ship(1);
         board.setCell(i, i, ship);
     }
-
+    const ship = new Ship(1);
+    board.setCell(1,2, ship);
     return board;
 };
 
