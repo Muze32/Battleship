@@ -1,6 +1,8 @@
+import { getRandomArray, getRandomDirection, getRandomInt } from "./randomFunctions";
+
 class Ship {
-    constructor(length) {
-        this.isHorizontal = false;
+    constructor(length, direction = false) {
+        this.isHorizontal = direction;
         this.length = length;
         this.timesPlaced = 0;
         this.numHits = 0;
@@ -34,7 +36,7 @@ class Ship {
         return this.length === this.numHits;
     }
 
-    isHorizontal() {
+    getIsHorizontal() {
         return this.isHorizontal;
     }
 
@@ -84,7 +86,7 @@ class Gameboard {
 
     hasAdjacentCells(x, y, ship) {
         //The possible moves changes depending if the direction of the ship is horizontal or vertical
-        const moves = ship.isHorizontal() === true ? [[-1, 0], [1, 0]] : [[0, -1], [0, 1]];
+        const moves = ship.getIsHorizontal() === true ? [[-1, 0], [1, 0]] : [[0, -1], [0, 1]];
 
         const possibleMoves = moves.map(([posX, posY]) => [x + posX, y + posY]);
 
@@ -99,22 +101,27 @@ class Gameboard {
         return false;
     }
 
-    hasNearShips(x, y, ship = null) {
+    hasNearShips(x, y) {
         const moves = [[-1, -1], [1, 1], [1, -1], [-1, 1], [0, 1], [0, -1], [1, 0], [-1, 0]];
         const possibleMoves = moves.map(([posX, posY]) => [x + posX, y + posY]);
 
         for (const [newX, newY] of possibleMoves) {
             const foundShip = this.getShip(newX, newY);
 
-            if (foundShip && ship && foundShip !== ship) {
+            if (foundShip) {
                 return true;
             }
         }
         return false;
     }
 
+    isAvailable(x, y) {
+        const ship = this.getShip(x, y);
+        return (ship !== undefined && !this.hasNearShips(x, y));
+    }
+
     getShip(x, y) {
-        if (!this.#isInBounds(x, y)) return null;
+        if (!this.#isInBounds(x, y)) return undefined;
         return this.board[x][y].ship;
     }
 
@@ -164,30 +171,62 @@ class Gameboard {
         return available;
     }
 
-    #generateRandomArray(max, array = null) {
-        if (array === null) {
-            array = Array.from({ length: max }, (_, i) => i + 1);
+    placeRandomShips(numShips = this.ships) {
+        const randomShipSizes = getRandomArray(numShips);
+        const possiblePositions = this.getLonelyCells();
+        const randomPositions = getRandomArray(possiblePositions.length, possiblePositions);
+
+        for (const size of randomShipSizes) {
+            const direction = getRandomDirection();
+            const ship = new Ship(size, direction);
+            this.placeInRandomPos(ship, randomPositions);
         }
-
-        for (let i = array.length - 1; i > 0; i--) {
-            const randomIndex = Math.floor(Math.random() * (i + 1));
-
-            // Intercambiar posiciones
-            [array[i], array[randomIndex]] = [array[randomIndex], array[i]];
-        }
-
-        return array;
     }
 
-    placeRandomShips(max = this.ships) {
-        const randomShipSizes = this.#generateRandomArray(max);
-        const possibleMoves = this.getLonelyCells();
-        const randomMoves = this.#generateRandomArray(max, possibleMoves);
+    placeInRandomPos(ship, randomPositions) {
+        for (const pos of randomPositions) {
+            const direction = this.isAbleToPlace(ship, pos);
 
-
-        console.log("a");
+            if (direction) {
+                this.placeConsecutiveShips(ship, pos, direction);
+                return;
+            }
+        }
     }
 
+    isAbleToPlace(ship, { x, y }) {
+        let hasShipsForwards = false, hasShipsBackwards = false;
+        const isHorizontal = ship.getIsHorizontal();
+
+        for (let i = 0; i < ship.getLength(); i++) {
+            if (isHorizontal) {
+                if (!this.isAvailable(x + i, y)) hasShipsForwards = true;
+                if (!this.isAvailable(x - i, y)) hasShipsBackwards = true;
+            } else {
+                if (!this.isAvailable(x, y + i)) hasShipsForwards = true;
+                if (!this.isAvailable(x, y - i)) hasShipsBackwards = true;
+            }
+        }
+
+        //If the path forward and backwards is unavailable returns null
+        if (hasShipsBackwards && hasShipsForwards) return null;
+
+        return !hasShipsForwards ? "forward" : "backward";
+    }
+
+    placeConsecutiveShips(ship, { x, y }, direction) {
+        const length = ship.getLength();
+        const isHorizontal = ship.getIsHorizontal();
+        const step = direction === "forward" ? 1 : -1;
+
+        for (let i = 0; i < length; i++) {
+            if (isHorizontal) {
+                this.setCell(x + i * step, y, ship);
+            } else {
+                this.setCell(x, y + i * step, ship);
+            }
+        }
+    }
 }
 
 class Player {
@@ -201,14 +240,13 @@ class Player {
 }
 
 class CPU {
-    constructor(board, randomFn = Math.random) {
+    constructor(board) {
         this.board = board;
-        this.randomFn = randomFn;
     }
 
     getMove() {
         const available = this.board.getLonelyCells();
-        const randomIndex = Math.floor(this.randomFn() * available.length);
+        const randomIndex = getRandomInt(available.length);
         return available[randomIndex];
     }
 

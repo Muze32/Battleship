@@ -145,9 +145,14 @@ const setupGame = () => {
 };
 
 const startGame = () => {
-    const gameBoard = createTempBoard();
-    const gameBoard1 = createTempBoard();
-    //gameBoard.placeRandomShips();
+    const gameBoard = new Gameboard();
+    const gameBoard1 = new Gameboard();
+
+    //Places randoms ships on the boards
+    gameBoard.placeRandomShips();
+    gameBoard1.placeRandomShips();
+
+    //Creates the players
     const player1 = new Player(gameBoard);
     const player2 = game.mode === "cpu" ? new CPU(gameBoard1) : new Player(gameBoard1);
 
