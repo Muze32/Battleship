@@ -34,6 +34,10 @@ main {
     justify-content: center;
 }
 
+.resetBtnDiv {
+    gap: 1rem;
+}
+
 .resetBtn {
     padding: .85rem;
     font-size: 1rem;
@@ -43,4 +47,16 @@ main {
 .resetBtn:hover {
     background-color: red;
     color: white;
+}
+
+
+
+/*******DIALOG*******/
+
+dialog {
+    background-color: #1c1b22;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 1.5rem;
 }
