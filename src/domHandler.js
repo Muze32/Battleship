@@ -36,7 +36,7 @@ const setupGame = () => {
 const resetGame = () => {
     resetElements('p1BoardDiv', 'p2BoardDiv', 'winH2');
     const p2BoardDiv = document.getElementById('p2BoardDiv');
-    p2BoardDiv.classList.remove("disabled");
+    p2BoardDiv.classList.remove("disabled", "visible");
 
     const boardsContainer = document.getElementById("boardsContainer");
     boardsContainer.classList.remove("disabled");
@@ -229,6 +229,7 @@ const updateTurnH1 = () => {
 const updatePlayersBoards = () => {
     const p1BoardDiv = document.getElementById('p1BoardDiv');
     const p2BoardDiv = document.getElementById('p2BoardDiv');
+    const resetBtn = document.getElementById("resetBtn");
 
     //If the game mode is two players
     if (game.mode !== "cpu") {
@@ -244,7 +245,12 @@ const updatePlayersBoards = () => {
     if (game.turn === 2) {
         p1BoardDiv.classList.add("disabled");
         p2BoardDiv.classList.add("disabled");
-        playCPUMove();
+
+        //Disables the reset button to prevent any possible bug
+        resetBtn.disabled = true;
+        resetBtn.classList.add("disabled");
+
+        playCPUMove(resetBtn);
     } else {
         p2BoardDiv.classList.remove("disabled");
     }
@@ -252,7 +258,7 @@ const updatePlayersBoards = () => {
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-const playCPUMove = async () => {
+const playCPUMove = async (resetBtn) => {
     //The delay will take a random value between 750ms and 2500 ms
     const randomDelayms = Math.floor(Math.random() * (2500 - 750)) + 750;
     await delay(randomDelayms);
@@ -262,6 +268,8 @@ const playCPUMove = async () => {
     const container = document.getElementById("p1BoardDiv");
     const btn = container.querySelector(`[data-x="${move.x}"][data-y="${move.y}"]`);
     btn.click();
+    resetBtn.disabled = false;
+    resetBtn.classList.remove("disabled");
 };
 
 export { setupGame }
