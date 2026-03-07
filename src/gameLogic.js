@@ -231,12 +231,16 @@ class Gameboard {
 }
 
 class Player {
-    constructor(gameboard) {
-        this.gameboard = gameboard;
+    constructor(board) {
+        this.board = board;
     }
 
     getBoard() {
-        return this.gameboard;
+        return this.board;
+    }
+
+    setBoard(board) {
+        this.board = board;
     }
 }
 
@@ -253,6 +257,10 @@ class CPU {
 
     getBoard() {
         return this.board;
+    }
+
+    setBoard(board) {
+        this.board = board;
     }
 }
 
