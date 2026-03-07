@@ -158,14 +158,15 @@ class Gameboard {
         return this.sunkShips === this.ships;
     }
 
-    getLonelyCells() {
+    getLonelyCells(action) {
         const available = [];
         for (let y = 0; y < this.size; y++) {
             for (let x = 0; x < this.size; x++) {
                 const marked = this.getMarked(x, y);
 
-                if (!marked && !this.hasNearShips(x, y))
+                if (!marked && (action === "available" || (action === "lonely" && !this.hasNearShips(x, y)))) {
                     available.push({ x, y });
+                }
             }
         }
         return available;
@@ -173,7 +174,7 @@ class Gameboard {
 
     placeRandomShips(numShips = this.ships) {
         const randomShipSizes = getRandomArray(numShips);
-        const possiblePositions = this.getLonelyCells();
+        const possiblePositions = this.getLonelyCells("lonely");
         const randomPositions = getRandomArray(possiblePositions.length, possiblePositions);
 
         for (const size of randomShipSizes) {
@@ -244,8 +245,8 @@ class CPU {
         this.board = board;
     }
 
-    getMove() {
-        const available = this.board.getLonelyCells();
+    getMove(board) {
+        const available = board.getLonelyCells("available");
         const randomIndex = getRandomInt(available.length);
         return available[randomIndex];
     }

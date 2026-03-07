@@ -3,7 +3,8 @@ import { Gameboard, Player, Ship, CPU } from "./gameLogic";
 const game = {
     mode: null,
     turn: 1,
-    cpu: null
+    player1: null,
+    player2: null
 };
 
 const createBoard = (player, boardDiv) => {
@@ -15,36 +16,45 @@ const createBoard = (player, boardDiv) => {
     boardDiv.appendChild(document.createElement("span"));
 
     for (let letter of letters) {
-        const letterSpan = document.createElement("span");
-        letterSpan.classList.add("cellLetter");
-        letterSpan.textContent = letter;
-        boardDiv.appendChild(letterSpan);
+        createLetterSpan(boardDiv, letter);
     }
 
     //First creates cols then rows
     for (let y = 0; y < size; y++) {
-        const numberSpan = document.createElement('span');
-        numberSpan.classList.add("cellNumber");
-        numberSpan.textContent = y + 1;
-        boardDiv.appendChild(numberSpan);
-
+        createNumberSpan(boardDiv, y);
         for (let x = 0; x < size; x++) {
-            const cellBtn = createCellBtn(x, y, player);
-            if (gameboard.getShip(x, y)) {
-                cellBtn.classList.add("ship");
-            }
-            boardDiv.appendChild(cellBtn);
+            createCellBtn(boardDiv, x, y, player);
         }
     }
 };
 
-const createCellBtn = (x, y, player) => {
+const createLetterSpan = (boardDiv, letter) => {
+    const letterSpan = document.createElement("span");
+    letterSpan.classList.add("cellLetter");
+    letterSpan.textContent = letter;
+    boardDiv.appendChild(letterSpan);
+}
+
+const createNumberSpan = (boardDiv, y) => {
+    const numberSpan = document.createElement('span');
+    numberSpan.classList.add("cellNumber");
+    numberSpan.textContent = y + 1;
+    boardDiv.appendChild(numberSpan);
+}
+
+const createCellBtn = (boardDiv, x, y, player) => {
+    const gameboard = player.getBoard();
     const cellBtn = document.createElement('button');
     cellBtn.dataset.x = x;
     cellBtn.dataset.y = y;
     cellBtn.classList.add("cellBtn");
     cellBtn.addEventListener('click', (e) => updateCell(e, player));
-    return cellBtn;
+
+    if (gameboard.getShip(x, y)) {
+        cellBtn.classList.add("ship");
+    }
+
+    boardDiv.appendChild(cellBtn);
 };
 
 const updateCell = (e, player) => {
@@ -72,16 +82,17 @@ const updateCell = (e, player) => {
     }
 };
 
-const switchTurn = async () => {
-    const p1BoardDiv = document.getElementById('p1BoardDiv');
-    const p2BoardDiv = document.getElementById('p2BoardDiv');
+const switchTurn = () => {
+    //Switchs turn
+    game.turn = game.turn === 1 ? 2 : 1;
+    updateTurnH1();
+    updatePlayersBoards();
+};
+
+const updateTurnH1 = () => {
     const playerTurnH1 = document.getElementById("playerTurnH1");
     let stringPlayer;
 
-    //Switchs turn
-    game.turn = game.turn === 1 ? 2 : 1;
-
-    //Updates stringPlayer
     if (game.mode === "cpu" && game.turn === 2) {
         stringPlayer = "CPU";
     } else {
@@ -90,6 +101,11 @@ const switchTurn = async () => {
 
     //Updates player turn on screen
     playerTurnH1.textContent = `${stringPlayer} turn`;
+}
+
+const updatePlayersBoards = () => {
+    const p1BoardDiv = document.getElementById('p1BoardDiv');
+    const p2BoardDiv = document.getElementById('p2BoardDiv');
 
     //If the game mode is two players
     if (game.mode !== "cpu") {
@@ -105,20 +121,21 @@ const switchTurn = async () => {
     if (game.turn === 2) {
         p1BoardDiv.classList.add("disabled");
         p2BoardDiv.classList.add("disabled");
-
-        //The delay will take a random value between 750ms and 2500 ms
-        const randomDelayms = Math.floor(Math.random() * (2500 - 750)) + 750;
-        await delay(randomDelayms);
         playCPUMove();
     } else {
         p2BoardDiv.classList.remove("disabled");
     }
-};
+}
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-const playCPUMove = () => {
-    const move = game.cpu.getMove();
+const playCPUMove = async () => {
+    //The delay will take a random value between 750ms and 2500 ms
+    const randomDelayms = Math.floor(Math.random() * (2500 - 750)) + 750;
+    await delay(randomDelayms);
+
+    const board = game.player1.getBoard();
+    const move = game.player2.getMove(board);
     const container = document.getElementById("p1BoardDiv");
     const btn = container.querySelector(`[data-x="${move.x}"][data-y="${move.y}"]`);
     btn.click();
@@ -154,12 +171,10 @@ const startGame = () => {
 
     //Creates the players
     const player1 = new Player(gameBoard);
-    const player2 = game.mode === "cpu" ? new CPU(gameBoard1) : new Player(gameBoard1);
+    const player2 = game.mode === "player2" ? new Player(gameBoard1) : new CPU(gameBoard1);
 
-    if (game.mode === "cpu") {
-        game.cpu = player2;
-    }
-
+    game.player1 = player1;
+    game.player2 = player2;
     game.turn = 1;
 
     updateDOMElements(player1, player2);
