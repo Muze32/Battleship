@@ -1,12 +1,12 @@
 {
-  "name": "Battleship-game",
+  "name": "battleship-game",
   "version": "1.0.0",
   "description": "A browser game of the classical videogame battleship!",
   "main": "index.js",
   "scripts": {
     "build": "webpack --config webpack.prod.js",
     "dev": "webpack serve --config webpack.dev.js",
-    "deploy": "git checkout gh-pages && git merge main --no-edit && npm run build && git add dist -f && git commit && git subtree push --prefix dist origin gh-pages && git checkout main",
+    "deploy": "git checkout gh-pages && git merge main --no-edit && npm run build && git add dist -f && git commit -m 'Deployment commit' && git subtree push --prefix dist origin gh-pages && git checkout main",
     "test": "jest"
   },
   "keywords": [],
